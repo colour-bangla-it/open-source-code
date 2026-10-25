@@ -1,0 +1,26 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Serve existing files and directories directly
+  RewriteCond %{REQUEST_FILENAME} -f [OR]
+  RewriteCond %{REQUEST_FILENAME} -d
+  RewriteRule ^ - [L]
+
+  # Route all /product/* requests to /product/item/index.html (Client-Side Product Loader)
+  RewriteCond %{DOCUMENT_ROOT}/product/item/index.html -f
+  RewriteRule ^product/.*$ /product/item/index.html [L,NC]
+
+  # Serve directory index.html if present
+  RewriteCond %{REQUEST_FILENAME}/index.html -f
+  RewriteRule ^(.*)$ $1/index.html [L]
+
+  # Clean URL rewrite fallback for /category pages
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^([^/]+)/?$ $1/index.html [L]
+
+  # SPA Fallback to main index.html for unknown routes
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
